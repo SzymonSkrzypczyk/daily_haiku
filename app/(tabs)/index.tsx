@@ -4,14 +4,13 @@ import { View, Text } from "react-native";
 import Buttons from "@/components/Buttons";
 import { StyleSheet } from "react-native";
 import * as Sharing from 'expo-sharing';
-import { Asset } from "expo-asset";
-import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from 'expo-media-library';
 
 export default function Index(){
     const haikuRef = useRef<View>(null);
     const [status, requestPermission] = MediaLibrary.usePermissions();
     const [imageUri, setImageUri] = useState<string | null>(null);
+    const [haiku, setHaiku] = useState<string[]>(["A world of dew", "And within every dewdrop", "A world of struggle."]);
 
     const onHaikuShare = async () => {
         if (status == null) {
@@ -24,8 +23,8 @@ export default function Index(){
           });
     
           await Sharing.shareAsync(localUri);
-          if (localUri) {
-            alert('Saved!');
+          if (!localUri) {
+            alert('error while sharing your Haiku!');
           }
         } catch (e) {
           console.log(e);
@@ -37,9 +36,9 @@ export default function Index(){
         style={styles.container}>
             <View style={styles.innerContainer} >
                 <View ref={haikuRef} collapsable={false}>
-                    <Text style={styles.text}>A world of dew</Text>
-                    <Text style={styles.text}>And within every dewdrop</Text>
-                    <Text style={styles.text}>A world of struggle.</Text>
+                    <Text style={styles.text}>{haiku[0]}</Text>
+                    <Text style={styles.text}>{haiku[1]}</Text>
+                    <Text style={styles.text}>{haiku[2]}</Text>
                 </View>
                 <Buttons shareFunction={onHaikuShare}/>
             </View>
@@ -64,5 +63,8 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 36,
+        textAlign: "center",
+        margin: "auto",
+        marginHorizontal: "10%"
     }
 });
