@@ -1,46 +1,48 @@
 import { useState, useRef } from 'react';
-import { captureRef } from 'react-native-view-shot'
-import { View, Text } from "react-native";
+import { captureRef } from 'react-native-view-shot';
+import { View, Text, StyleSheet } from "react-native";
 import Buttons from "@/components/Buttons";
-import { StyleSheet } from "react-native";
 import * as Sharing from 'expo-sharing';
-import * as MediaLibrary from 'expo-media-library';
+import { useSharedState } from '@/context/SharedStateContext';
 
-export default function Index(){
+export default function Index() {
+    const { isDark } = useSharedState();  // Access dark mode state from context
+    
     const haikuRef = useRef<View>(null);
-    const [status, requestPermission] = MediaLibrary.usePermissions();
-    const [imageUri, setImageUri] = useState<string | null>(null);
-    const [haiku, setHaiku] = useState<string[]>(["A world of dew", "And within every dewdrop", "A world of struggle."]);
+
+    const [haiku, setHaiku] = useState<string[]>([
+        "A world of dew", 
+        "And within every dewdrop", 
+        "A world of struggle."
+    ]);
 
     const onHaikuShare = async () => {
-        if (status == null) {
-            requestPermission();
-        }
         try {
-          const localUri = await captureRef(haikuRef, {
-            height: 440,
-            quality: 1,
-          });
-    
-          await Sharing.shareAsync(localUri);
-          if (!localUri) {
-            alert('error while sharing your Haiku!');
-          }
+            const localUri = await captureRef(haikuRef, {
+                height: 440,
+                quality: 1,
+            });
+            
+            await Sharing.shareAsync(localUri);
+            if (!localUri) {
+                alert('Error while sharing your Haiku!');
+            }
         } catch (e) {
-          console.log(e);
+            console.log(e);
         }
-      };
+    };
 
     return (
-        <View
-        style={styles.container}>
-            <View style={styles.innerContainer} >
+        <View style={[styles.container, { backgroundColor: isDark ? "#121212" : "#fff" }]}>
+            <View style={styles.innerContainer}>
                 <View ref={haikuRef} collapsable={false}>
-                    <Text style={styles.text}>{haiku[0]}</Text>
-                    <Text style={styles.text}>{haiku[1]}</Text>
-                    <Text style={styles.text}>{haiku[2]}</Text>
+                    {haiku.map((line, index) => (
+                        <Text key={index} style={[styles.text, { color: isDark ? "white" : "black" }]}>
+                            {line}
+                        </Text>
+                    ))}
                 </View>
-                <Buttons shareFunction={onHaikuShare}/>
+                <Buttons shareFunction={onHaikuShare} />
             </View>
         </View>
     );
@@ -52,7 +54,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         width: "100%",
-        backgroundColor: "lightgrey",
     },
     innerContainer: {
         flexDirection: "column",
@@ -60,11 +61,13 @@ const styles = StyleSheet.create({
         alignItems: "center",
         width: "100%",
         gap: 10,
+        padding: 20,
     },
     text: {
         fontSize: 36,
         textAlign: "center",
         margin: "auto",
-        marginHorizontal: "10%"
-    }
+        marginHorizontal: "10%",
+        fontWeight: "bold",
+    },
 });

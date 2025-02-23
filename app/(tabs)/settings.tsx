@@ -1,14 +1,11 @@
 import { useState } from "react";
-import { View, Text, Switch, FlatList } from "react-native";
-import { StyleSheet } from "react-native";
-import ThemeIcon from "@/components/ThemeIcon";
-
+import { View, Text, Switch, FlatList, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { useSharedState } from '@/context/SharedStateContext';
 
 interface Theme {
     key: number;
     image: any;
 }
-
 
 export default function Settings() {
     const themes: Theme[] = [
@@ -19,20 +16,30 @@ export default function Settings() {
         { key: 5, image: require("@/assets/images/themes/theme5.jpg") }
     ];
 
-    const [activeTheme, setActiveTheme] = useState<number>(1);
+    // Use shared state to get and set the active theme
+    const { activeTheme, setActiveTheme, isDark, toggleDarkTheme } = useSharedState();
 
-    const [isDark, setIsDark] = useState<boolean>(false);
-    const toggleTheme = () => setIsDark(!isDark);
+    const renderThemeItem = ({ item }: { item: Theme }) => (
+        <TouchableOpacity onPress={() => setActiveTheme(item.key)} style={styles.themeItem}>
+            <Image source={item.image} style={[styles.themeImage, activeTheme === item.key && styles.selectedTheme]} />
+        </TouchableOpacity>
+    );
 
     return (
-        <View style={[styles.container, { backgroundColor: isDark ? "#121212" : "white" }]}>
+        <View style={[styles.container, { backgroundColor: isDark ? "#121212" : "#fff" }]}>
             <View style={styles.row}>
-                <Text style={{ color: isDark ? "white" : "black" }}>Dark Mode</Text>
-                <Switch value={isDark} onValueChange={toggleTheme} />
+                <Text style={[styles.text, { color: isDark ? "white" : "black" }]}>Dark Mode</Text>
+                <Switch value={isDark} onValueChange={toggleDarkTheme} />
             </View>
             <View style={styles.row_themes}>
-                <Text style={{ color: isDark ? "white" : "black", "marginRight": "30%" }}>Theme</Text>
-                <FlatList data={themes} renderItem={({ item }) => <ThemeIcon image={item.image} activeTheme={activeTheme} setActiveTheme={setActiveTheme} themeKey={item.key}/>} horizontal/>
+                <Text style={[styles.text, { color: isDark ? "white" : "black" }]}>Select Theme</Text>
+                <FlatList
+                    data={themes}
+                    renderItem={renderThemeItem}
+                    horizontal
+                    keyExtractor={(item) => item.key.toString()}
+                    contentContainerStyle={styles.themeList}
+                />
             </View>
         </View>
     );
@@ -44,23 +51,49 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
         alignItems: "center",
         marginTop: "20%",
+        paddingHorizontal: 20,
     },
     row: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        width: "80%",
-        padding: 20,
+        width: "100%",
+        paddingVertical: 15,
         borderBottomWidth: 1,
         borderBottomColor: "lightgrey",
     },
     row_themes: {
-        flexDirection: "row",
-        justifyContent: "space-between",
+        flexDirection: "column",
+        justifyContent: "flex-start",
         alignItems: "center",
-        width: "80%",
-        padding: 20,
+        width: "100%",
+        paddingVertical: 15,
         borderBottomWidth: 1,
         borderBottomColor: "lightgrey",
-    }
+    },
+    text: {
+        fontSize: 18,
+        fontWeight: "600",
+    },
+    themeList: {
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 15,
+    },
+    themeItem: {
+        borderRadius: 10,
+        overflow: "hidden",
+    },
+    themeImage: {
+        width: 80,
+        height: 80,
+        borderRadius: 10,
+        opacity: 0.8,
+    },
+    selectedTheme: {
+        borderWidth: 3,
+        borderColor: "#4CAF50",
+        opacity: 1,
+    },
 });

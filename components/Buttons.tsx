@@ -44,14 +44,14 @@ export default function Buttons({ color, size, shareFunction }: ButtonsProps) {
                     <Ionicons
                         name={liked ? "heart-sharp" : "heart-outline"}
                         size={size ?? 48}
-                        color={liked ? "red" : color ?? "white"}
+                        color={liked ? "red" : color ?? "blue"}
                     />
                 </Animated.View>
             </Pressable>
 
             <Pressable style={styles.button} onPress={handleShare}>
                 <Animated.View style={{ transform: [{ scale: scaleAnimShare }] }}>
-                    <Ionicons name="share-outline" size={size ?? 48} color={color ?? "white"} />
+                    <Ionicons name="share-outline" size={size ?? 48} color={color ?? "blue"} />
                 </Animated.View>
             </Pressable>
         </View>
