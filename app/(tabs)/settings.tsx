@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 
-export default function NotFound(){
+
+export default function Settings(){
     return (
         <View
         style={{
@@ -9,8 +10,7 @@ export default function NotFound(){
             alignItems: "center",
         }}
         >
-        <Text>Not Found</Text>
+        <Text>Settings</Text>
         </View>
-    )
-
-};
+    );
+}
